@@ -22,9 +22,14 @@ app.layout = html.Div(
         html.Div(
           id="output-heatmap",
           children=[
-            html.B("volume"),
+            html.Div(id='live-update-text'),
             html.Hr(),
             dcc.Graph(id="hm_volume"),
+            dcc.Interval(
+              id='interval-component',
+              interval=10*1000,
+              n_intervals=0
+            )
           ],
         ),
       ],
@@ -33,16 +38,27 @@ app.layout = html.Div(
 )
 
 @app.callback(
-  Output("hm_volume", "figure"),
-  [Input("hm_volume", "clickData"),]
+  Output('live-update-text','children'),
+  [Input('interval-component','n_intervals')])
+def update_metrics(n):
+  return [html.Span(n)]
+
+@app.callback(
+  Output('hm_volume', 'figure'),
+  [Input('hm_volume', 'clickData'),
+  Input('interval-component','n_intervals'),
+  ]
 )
-def update_heatmap(hm_vol):
-  return generate_heatmap()
+def update_heatmap(hm_vol, n):
+  csv_file = ""
+  if (n % 2):
+    csv_file = "sample.csv"
+  else:
+    csv_file = "sample2.csv"
+  return generate_heatmap(csv_file)
 
-
-def generate_heatmap():
-
-  df = pd.read_csv("sample.csv")
+def generate_heatmap(file_name):
+  df = pd.read_csv(file_name)
   item_list = df["Item Name"].unique()
   warehouse_list = df["Warehouse Name"].unique()
 

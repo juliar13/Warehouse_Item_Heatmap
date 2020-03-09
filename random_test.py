@@ -12,7 +12,7 @@ for i in range(item_num):
 
 data_num = 1000
 
-with open('sample.csv', 'w') as f:
+with open('sample2.csv', 'w') as f:
   print("Item Name,Warehouse Name,Date,Number of Records,Lot Number,Warehouse Index", file=f)
 
   for i in range(data_num):
