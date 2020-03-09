@@ -53,10 +53,24 @@ def generate_heatmap():
   warehouse_list_len = len(warehouse_list)
 
   z = np.zeros((warehouse_list_len, item_list_len))
+  annotations = []
 
-  for i, y in enumerate(y_axis):
-    for j, x in enumerate(x_axis):
-      z[i][j] = i*j
+  for i, y_val in enumerate(y_axis):
+    filtered_df = df[df["Warehouse Name"] == y_val]
+    for j, x_val in enumerate(x_axis):
+      sum_of_record = filtered_df[filtered_df["Item Name"] == x_val]["Number of Records"].sum()
+      z[i][j] = sum_of_record
+
+      annotation_dict = dict(
+        showarrow=False,
+        text=str(sum_of_record),
+        # xref="x",
+        # yref="y",
+        x=x_val,
+        y=y_val,
+        # font=dict(family="sans-serif"),
+      )
+      annotations.append(annotation_dict)
 
   data = [
     dict(
@@ -69,6 +83,7 @@ def generate_heatmap():
   ]
 
   layout = dict(
+    annotations=annotations,
     x_axis=dict(
       side="top",
     ),
@@ -78,9 +93,6 @@ def generate_heatmap():
   )
 
   return {"data": data, "layout": layout}
-
-
-
 
 if __name__ == "__main__":
   app.run_server(debug=True)
