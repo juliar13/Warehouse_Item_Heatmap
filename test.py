@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output
 
 import numpy as np
 import pandas as pd
+import datetime
 
 app = dash.Dash(__name__,
   meta_tags=[{"name": "viewport",
@@ -41,7 +42,7 @@ app.layout = html.Div(
   Output('live-update-text','children'),
   [Input('interval-component','n_intervals')])
 def update_metrics(n):
-  return [html.Span(n)]
+  return [html.P(datetime.datetime.now()),html.P(str(n) + " times")]
 
 @app.callback(
   Output('hm_volume', 'figure'),
