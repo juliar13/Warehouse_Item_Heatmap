@@ -28,7 +28,7 @@ app.layout = html.Div(
             dcc.Graph(id="hm_volume"),
             dcc.Interval(
               id='interval-component',
-              interval=10*1000,
+              interval=10*1000, # 10 sec
               n_intervals=0
             )
           ],
@@ -38,12 +38,14 @@ app.layout = html.Div(
   ],
 )
 
+# Update Datetime
 @app.callback(
   Output('live-update-text','children'),
   [Input('interval-component','n_intervals')])
 def update_metrics(n):
   return [html.P(datetime.datetime.now()),html.P(str(n) + " times")]
 
+# Update Heatmap
 @app.callback(
   Output('hm_volume', 'figure'),
   [Input('hm_volume', 'clickData'),
@@ -52,17 +54,23 @@ def update_metrics(n):
 )
 def update_heatmap(hm_vol, n):
   csv_file = ""
+
+  # (TEMP) Heatmap Data Change At 10 Intervals
   if (n % 2):
     csv_file = "sample.csv"
   else:
     csv_file = "sample2.csv"
   return generate_heatmap(csv_file)
 
+# Generate Heatmap
 def generate_heatmap(file_name):
+
+  # Get Heatmap Data
   df = pd.read_csv(file_name)
   item_list = df["Item Name"].unique()
   warehouse_list = df["Warehouse Name"].unique()
 
+  # Set X-Axis and Y-Axis
   x_axis = item_list
   y_axis = warehouse_list
 
@@ -72,6 +80,8 @@ def generate_heatmap(file_name):
   z = np.zeros((warehouse_list_len, item_list_len))
   annotations = []
 
+  # Set Heatmap Value (z[i][j])
+  # Display Heatmap Value (annotation_dict)
   for i, y_val in enumerate(y_axis):
     filtered_df = df[df["Warehouse Name"] == y_val]
     for j, x_val in enumerate(x_axis):
